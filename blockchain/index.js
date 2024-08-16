@@ -12,8 +12,8 @@ const wallet = new ethers.Wallet(
   provider
 );
 
-async function send(msg) {
-  const data = ethers.utils.toUtf8Bytes(msg);
+async function send(message) {
+  const data = ethers.utils.toUtf8Bytes(message);
 
   const tx = {
     to: TO,
@@ -22,10 +22,12 @@ async function send(msg) {
   };
 
   const transaction = await wallet.sendTransaction(tx);
-  const { transactionHash } = await transaction.wait();
+  const { transactionHash, blockNumber, ...others } = await transaction.wait();
+
+  const { timestamp } = await provider.getBlock(blockNumber);
 
   console.log(transactionHash);
-  return transactionHash;
+  return { hash: transactionHash, timestamp, message };
 }
 
 module.exports = {
@@ -33,19 +35,17 @@ module.exports = {
 };
 
 // async function main() {
-//   const tx = {
-//     to: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-//     // value: ethers.utils.parseEther("0"),
-//     data: "0x4554482070726963652069732033303030",
-//   };
-
-//   // console.log(await wallet.getBalance());
-//   // console.log(await wallet.getTransactionCount());
-
-//   const t = await wallet.sendTransaction(tx);
-//   const { transactionHash } = await t.wait();
-
-//   console.log(t, transactionHash);
+//   // const tx = {
+//   //   to: "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+//   //   // value: ethers.utils.parseEther("0"),
+//   //   data: "0x4554482070726963652069732033303030",
+//   // };
+//   // // console.log(await wallet.getBalance());
+//   // // console.log(await wallet.getTransactionCount());
+//   // const t = await wallet.sendTransaction(tx);
+//   // const resp = await t.wait();
+//   // console.log(t, resp);
+//   // console.log(await provider.getBlock(178817225));
 // }
 
 // main().catch(console.log);

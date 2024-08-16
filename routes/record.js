@@ -24,12 +24,10 @@ router.post("/", function (req, res, next) {
 
   if (req?.body?.key === "123456") {
     send(req.body.message)
-      .then((hash) => {
+      .then((d) => {
         res.json({
           code: 0,
-          data: {
-            hash,
-          },
+          data: d,
           message: "",
         });
       })
