@@ -2,17 +2,24 @@ const ethers = require("ethers");
 
 const TO = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
-const provider = new ethers.providers.JsonRpcProvider(
-  "https://evmtestnet.confluxrpc.com"
-);
-// const provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
+function getWallet(chain) {
+  if (chain === "conflux") {
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://evmtestnet.confluxrpc.com"
+    );
 
-const wallet = new ethers.Wallet(
-  "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
-  provider
-);
+    const wallet = new ethers.Wallet(
+      "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
+      provider
+    );
 
-async function send(message) {
+    return wallet;
+  } else if (chain === "ethereum") {
+    // TODO
+  }
+}
+
+async function send(chain, message) {
   const data = ethers.utils.toUtf8Bytes(message);
 
   const tx = {
@@ -21,13 +28,15 @@ async function send(message) {
     // value: ethers.utils.parseEther("0"),
   };
 
+  const wallet = getWallet(chain);
+
   const transaction = await wallet.sendTransaction(tx);
   const { transactionHash, blockNumber, ...others } = await transaction.wait();
 
-  const { timestamp } = await provider.getBlock(blockNumber);
+  const { timestamp } = await wallet.provider.getBlock(blockNumber);
 
   console.log(transactionHash);
-  return { hash: transactionHash, timestamp, message };
+  return { hash: transactionHash, timestamp, message, chain };
 }
 
 module.exports = {
