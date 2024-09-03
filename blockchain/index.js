@@ -9,7 +9,7 @@ function getWallet(chain) {
     );
 
     const wallet = new ethers.Wallet(
-      "0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97",
+      "ad2159f97ebef30f920bb7eb863b668832ca51742582d7e8547c556a9df4ad74", // 0xc6c2085C44F1444C40558237d6A82360BA8Da01a
       provider
     );
 
