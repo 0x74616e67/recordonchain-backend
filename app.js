@@ -18,6 +18,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, "public")));
 // frontend build file
 app.use(express.static(path.join(__dirname, "out")));
@@ -25,6 +26,34 @@ app.use(express.static(path.join(__dirname, "out")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/record", recordRouter);
+
+// app.use((req, res, next) => {
+//   if (/(.ico|.js|.css|.jpg|.png|.map)$/i.test(req.path)) {
+//     next();
+//   } else {
+//     res.header("Cache-Control", "private, no-cache, no-store, must-revalidate");
+//     res.header("Expires", "-1");
+//     res.header("Pragma", "no-cache");
+//     res.sendFile(path.join(__dirname, "out", "index.html"));
+//   }
+// });
+
+// app.get("/record", (req, res) => {
+//   res.sendFile(path.join(__dirname, "out/record/", "index.html"));
+// });
+
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "out", "index.html"));
+// });
+
+// app.get("/record", function (req, res, next) {
+//   res.send("record");
+//   // res.sendFile(path.join(__dirname, "out", "record.html"));
+// });
+
+// app.get("/record/detail", function (req, res, next) {
+//   res.sendFile(path.join(__dirname, "out/record", "detail.html"));
+// });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

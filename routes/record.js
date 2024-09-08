@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 var cors = require("cors");
 const { send } = require("../blockchain");
+var path = require("path");
 
 // TODO 测试期间暂时对所有请求开放跨域请求
 // 是否只允许某些域名访问？
@@ -14,9 +15,12 @@ router.use(cors());
  * 2 - send tx error
  */
 
-/* GET users listing. */
 router.get("/", function (req, res, next) {
-  res.send("record");
+  res.sendFile(path.join(__dirname, "../out", "record.html"));
+});
+
+router.get("/detail", function (req, res, next) {
+  res.sendFile(path.join(__dirname, "../out/record", "detail.html"));
 });
 
 router.post("/", function (req, res, next) {
