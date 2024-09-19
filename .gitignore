@@ -4,3 +4,4 @@ out/
 *.key
 *.bak
 *.bak.*
+.env

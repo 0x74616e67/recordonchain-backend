@@ -1,12 +1,7 @@
 var express = require("express");
 var router = express.Router();
-var cors = require("cors");
-const { send } = require("../blockchain");
+const { send } = require("../blockchain/conflux");
 var path = require("path");
-
-// TODO 测试期间暂时对所有请求开放跨域请求
-// 是否只允许某些域名访问？
-router.use(cors());
 
 /**
  * error code:
@@ -56,6 +51,3 @@ router.post("/", function (req, res, next) {
 });
 
 module.exports = router;
-
-// curl -d '{"key":"123456", "message":"hello world 2"}' -H "Content-Type: application/json" -X POST http://localhost:9000/record
-// curl -d '{"key":"1", "message":"hello world"}' -H "Content-Type: application/json" -X POST http://localhost:9000/record
