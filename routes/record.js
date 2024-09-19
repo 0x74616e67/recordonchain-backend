@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const { send } = require("../blockchain/conflux");
+const { send } = require("../blockchain");
 var path = require("path");
 
 /**
@@ -10,6 +10,7 @@ var path = require("path");
  * 2 - send tx error
  */
 
+// return static page file
 router.get("/", function (req, res, next) {
   res.sendFile(path.join(__dirname, "../out", "record.html"));
 });
@@ -18,6 +19,7 @@ router.get("/detail", function (req, res, next) {
   res.sendFile(path.join(__dirname, "../out/record", "detail.html"));
 });
 
+// handle send tx request
 router.post("/", function (req, res, next) {
   console.log(req.body);
 
@@ -38,7 +40,7 @@ router.post("/", function (req, res, next) {
         res.json({
           code: 2,
           data: {},
-          message: "send tx error",
+          message: e.message ? e.message : "send tx error",
         });
       });
   } else {
