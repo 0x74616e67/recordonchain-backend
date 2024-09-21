@@ -27,13 +27,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use("/", indexRouter);
+app.use("/record", recordRouter);
+
 app.use(express.static(path.join(__dirname, "public")));
 // frontend build file
 app.use(express.static(path.join(__dirname, "out")));
-
-app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/record", recordRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
