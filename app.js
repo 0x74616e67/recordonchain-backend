@@ -8,6 +8,7 @@ var cors = require("cors");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var recordRouter = require("./routes/record");
+var verificationRouter = require("./routes/verification");
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/record", recordRouter);
+app.use("/verification", verificationRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
 // frontend build file

@@ -8,6 +8,7 @@ var path = require("path");
  * 0 - success
  * 1 - invalid key
  * 2 - send tx error
+ * 3 - get tx info error
  */
 
 // return static page file
@@ -40,7 +41,7 @@ router.post("/", function (req, res, next) {
         res.json({
           code: 2,
           data: {},
-          message: e.message ? e.message : "send tx error",
+          message: e?.message ? e?.message : "send tx error",
         });
       });
   } else {
