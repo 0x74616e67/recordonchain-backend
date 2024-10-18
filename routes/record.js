@@ -2,11 +2,12 @@ var express = require("express");
 var router = express.Router();
 const { send } = require("../blockchain");
 var path = require("path");
+const { verifyCode, updateCode } = require("./../middlewares/code");
 
 /**
  * error code:
  * 0 - success
- * 1 - invalid key
+ * 1 - ?
  * 2 - send tx error
  * 3 - get tx info error
  */
@@ -21,36 +22,32 @@ router.get("/detail", function (req, res, next) {
 });
 
 // handle send tx request
-router.post("/", function (req, res, next) {
-  console.log(req.body);
-
-  // if (req?.body?.key === "123456") {
-  // TODO pay logic
-  if (true) {
+router.post(
+  "/",
+  verifyCode,
+  function (req, res, next) {
     send(req.body.chain, req.body.message)
       .then((d) => {
-        res.json({
-          code: 0,
-          data: d,
-          message: "",
-        });
+        res.txData = d;
+
+        next();
       })
       .catch((e) => {
-        console.log(e);
-
-        res.json({
+        return res.json({
           code: 2,
           data: {},
           message: e?.message ? e?.message : "send tx error",
         });
       });
-  } else {
-    res.json({
-      code: 1,
-      data: {},
-      message: "invalid key",
+  },
+  updateCode,
+  function (req, res, next) {
+    return res.json({
+      code: 0,
+      data: res.txData,
+      message: "",
     });
   }
-});
+);
 
 module.exports = router;

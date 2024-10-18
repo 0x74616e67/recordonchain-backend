@@ -56,7 +56,7 @@ async function send(chain, message) {
 
     const { timestamp } = await wallet.provider.getBlock(blockNumber);
 
-    console.log(transactionHash);
+    // console.log(transactionHash);
     return { hash: transactionHash, timestamp, message, chain };
   } catch (e) {
     throw e;
