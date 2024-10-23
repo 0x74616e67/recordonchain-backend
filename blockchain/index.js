@@ -15,6 +15,11 @@ const NETWORKS = {
     privateKey: process.env.ETHEREUM_PRIVATE_KEY,
     to: process.env.ETHEREUM_TO,
   },
+  confluxevmtestnet: {
+    rpcUrl: process.env.CONFLUX_RPC_URL,
+    privateKey: process.env.CONFLUX_PRIVATE_KEY,
+    to: process.env.CONFLUX_TO,
+  },
 };
 
 const CHAINS = Object.keys(NETWORKS);
@@ -63,8 +68,13 @@ async function send(chain, message) {
   }
 }
 
+function isFreeTrailChain(chain) {
+  return chain === "confluxevmtestnet";
+}
+
 module.exports = {
   send,
+  isFreeTrailChain,
 };
 
 // async function main() {
