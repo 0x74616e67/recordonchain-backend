@@ -10,10 +10,11 @@ var db = require("../database").db;
  */
 
 const verifyCode = function (req, res, next) {
+  // 检查是不是试用网络，比如 confluxevmtestnet
   if (isFreeTrailChain(req.body.chain)) {
     next();
   } else {
-    const code = req.body.code;
+    const { code, chain } = req.body;
 
     if (!code) {
       return res.json({
@@ -23,32 +24,31 @@ const verifyCode = function (req, res, next) {
       });
     }
 
-    // 查询数据库，检查试用 code 是否存在
-    db.get(
-      "SELECT * FROM verification_code WHERE code = ?",
-      [code],
-      (err, row) => {
-        if (err) {
-          return res.json({
-            code: 1002,
-            data: {},
-            message: err?.message ? err.message : "Database error",
-          });
-        }
+    const TABLE = `verification_code_${chain}`;
+    const U_CODE = String(code).toUpperCase();
 
-        if (row && !row.verified) {
-          next();
-        } else {
-          return res.json({
-            code: 1003,
-            data: {
-              verified: false,
-            },
-            message: "Invalid code or code is verified",
-          });
-        }
+    // 查询数据库，检查试用 code 是否存在
+    db.get(`SELECT * FROM ${TABLE} WHERE code = ?`, [U_CODE], (err, row) => {
+      if (err) {
+        return res.json({
+          code: 1002,
+          data: {},
+          message: err?.message ? err.message : "Database error",
+        });
       }
-    );
+
+      if (row && !row.verified) {
+        next();
+      } else {
+        return res.json({
+          code: 1003,
+          data: {
+            verified: false,
+          },
+          message: "Invalid code or code is verified",
+        });
+      }
+    });
   }
 };
 
@@ -56,11 +56,13 @@ const updateCode = function (req, res, next) {
   if (isFreeTrailChain(req.body.chain)) {
     next();
   } else {
-    const code = req.body.code;
-    const sql = "UPDATE verification_code SET verified = 1 WHERE code = ?";
+    const { code, chain } = req.body;
+    const TABLE = `verification_code_${chain}`;
+    const U_CODE = String(code).toUpperCase();
+    const sql = `UPDATE ${TABLE} SET verified = 1 WHERE code = ?`;
 
     // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
-    db.run(sql, [code], function (err) {
+    db.run(sql, [U_CODE], function (err) {
       if (err) {
         return res.json({
           code: 1002,
