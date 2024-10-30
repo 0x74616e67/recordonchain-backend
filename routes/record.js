@@ -3,6 +3,7 @@ var router = express.Router();
 const { send } = require("../blockchain");
 var path = require("path");
 const { verifyCode, updateCode } = require("./../middlewares/code");
+const { saveRecord } = require("./../middlewares/record");
 
 /**
  * error code:
@@ -22,6 +23,23 @@ router.get("/detail", function (req, res, next) {
 });
 
 // handle send tx request
+/**
+ * method: POST
+ * body:
+ * {
+ *   chain: conflux | ethereum
+ *   message: string
+ *   code: C12345678 | E12345678
+ * }
+ * response data:
+ * {
+ *   hash: string,
+ *   timestamp: int,
+ *   message: 0xhash,
+ *   chain: conflux | ethereum,
+ * }
+ */
+
 router.post(
   "/",
   verifyCode,
@@ -41,6 +59,7 @@ router.post(
       });
   },
   updateCode,
+  saveRecord,
   function (req, res, next) {
     return res.json({
       code: 0,

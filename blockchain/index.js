@@ -75,6 +75,7 @@ function isFreeTrailChain(chain) {
 module.exports = {
   send,
   isFreeTrailChain,
+  NETWORKS,
 };
 
 // async function main() {

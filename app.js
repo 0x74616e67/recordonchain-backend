@@ -8,6 +8,7 @@ var cors = require("cors");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var recordRouter = require("./routes/record");
+var recordsRouter = require("./routes/records");
 var verificationRouter = require("./routes/verification");
 
 var app = express();
@@ -30,6 +31,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/record", recordRouter);
+app.use("/records", recordsRouter);
 app.use("/verification", verificationRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
