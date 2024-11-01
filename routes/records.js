@@ -4,6 +4,16 @@ var path = require("path");
 const { checkRequestParams } = require("./../middlewares/checkRequestParams");
 const db = require("../database").db;
 
+router.get("/", function (req, res, next) {
+  const { chain } = req.query;
+
+  if (chain === undefined) {
+    res.sendFile(path.join(__dirname, "../out", "records.html"));
+  } else {
+    next("route");
+  }
+});
+
 router.get(
   "/",
   checkRequestParams(["page", "pageSize", "chain", "order", "startRowId"]),
