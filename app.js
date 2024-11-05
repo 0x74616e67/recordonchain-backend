@@ -10,6 +10,7 @@ var usersRouter = require("./routes/users");
 var recordRouter = require("./routes/record");
 var recordsRouter = require("./routes/records");
 var verificationRouter = require("./routes/verification");
+var settingRouter = require("./routes/setting");
 
 var app = express();
 
@@ -33,6 +34,7 @@ app.use("/", indexRouter);
 app.use("/record", recordRouter);
 app.use("/records", recordsRouter);
 app.use("/verification", verificationRouter);
+app.use("/setting", settingRouter);
 
 app.use(express.static(path.join(__dirname, "public")));
 // frontend build file
