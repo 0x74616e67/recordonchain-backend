@@ -6,7 +6,8 @@ const db = require("../database").db;
  * 1001 - Code is required
  * 1002 - Database error
  * 1003 - Invalid code or code is verified
- * 1004 - Update verification status error
+ * 1005 - Code is verified
+ * 1006 - Code is locked
  */
 
 const verifyCode = function (req, res, next) {
@@ -37,8 +38,54 @@ const verifyCode = function (req, res, next) {
         });
       }
 
-      if (row && !row.verified) {
-        next();
+      if (row) {
+        if (row.verified) {
+          return res.json({
+            code: 1005,
+            data: {
+              verified: true,
+            },
+            message: "Code is verified",
+          });
+        } else if (row.locked) {
+          return res.json({
+            code: 1006,
+            data: {
+              verified: false,
+              locked: true,
+            },
+            message: "Code is locked",
+          });
+        } else {
+          // 在使用 code 进行 create record 的时候，一定要先锁定 code，防止用单一 code 发起同时创建
+          db.run(
+            `UPDATE ${TABLE} SET locked = 1 WHERE code = ?`,
+            [U_CODE],
+            function (err) {
+              if (err) {
+                return res.json({
+                  code: 1002,
+                  data: {},
+                  message: err?.message ? err.message : "Database error",
+                });
+              } else {
+                // 检查更新的行数
+                if (this.changes === 0) {
+                  return res.json({
+                    code: 1002,
+                    data: {},
+                    message: err?.message ? err.message : "Database error",
+                    // message: err?.message
+                    //   ? err.message
+                    //   : "Update locked status failed",
+                  });
+                } else {
+                  next();
+                }
+              }
+            }
+          );
+        }
       } else {
         return res.json({
           code: 1003,
@@ -59,7 +106,7 @@ const updateCode = function (req, res, next) {
     const { code, chain } = req.body;
     const TABLE = `verification_code_${chain}`;
     const U_CODE = String(code).toUpperCase();
-    const sql = `UPDATE ${TABLE} SET verified = 1 WHERE code = ?`;
+    const sql = `UPDATE ${TABLE} SET verified = 1, locked = 0 WHERE code = ?`;
 
     // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
     db.run(sql, [U_CODE], function (err) {
@@ -73,11 +120,12 @@ const updateCode = function (req, res, next) {
         // 检查更新的行数
         if (this.changes === 0) {
           return res.json({
-            code: 1004,
+            code: 1002,
             data: {},
-            message: err?.message
-              ? err.message
-              : "Update verification status failed",
+            message: err?.message ? err.message : "Database error",
+            // message: err?.message
+            //   ? err.message
+            //   : "Update verification status failed",
           });
         } else {
           next();

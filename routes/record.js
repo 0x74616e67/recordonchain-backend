@@ -4,6 +4,7 @@ const { send } = require("../blockchain");
 var path = require("path");
 const { verifyCode, updateCode } = require("./../middlewares/code");
 const { saveRecord } = require("./../middlewares/record");
+const db = require("../database").db;
 
 /**
  * error code:
@@ -51,11 +52,40 @@ router.post(
         next();
       })
       .catch((e) => {
-        return res.json({
-          code: 2,
-          data: {},
-          message: e?.message ? e?.message : "send tx error",
-        });
+        const { code, chain } = req.body;
+        const TABLE = `verification_code_${chain}`;
+        const U_CODE = String(code).toUpperCase();
+
+        // TODO 更新 code locked status 暂时放在这里，后续再优化
+        // 重置 verification code locked status
+        db.run(
+          `UPDATE ${TABLE} SET locked = 0 WHERE code = ?`,
+          [U_CODE],
+          function (err) {
+            if (err) {
+              return res.json({
+                code: 1002,
+                data: {},
+                message: err?.message ? err.message : "Database error",
+              });
+            } else {
+              // 检查更新的行数
+              if (this.changes === 0) {
+                return res.json({
+                  code: 1002,
+                  data: {},
+                  message: err?.message ? err.message : "Database error",
+                });
+              } else {
+                return res.json({
+                  code: 2,
+                  data: {},
+                  message: e?.message ? e?.message : "send tx error",
+                });
+              }
+            }
+          }
+        );
       });
   },
   updateCode,
