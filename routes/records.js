@@ -16,19 +16,13 @@ router.get("/", function (req, res, next) {
 
 router.get(
   "/",
-  checkRequestParams(["page", "pageSize", "chain", "order", "startRowId"]),
+  checkRequestParams(["pageSize", "chain", "order", "startRowId"]),
   function (req, res, next) {
-    const { chain, pageSize, page, order, startRowId } = req.query;
-    let sql = `SELECT rowid as id, * FROM records_${chain}`;
-
-    if (startRowId) {
-      sql += " WHERE rowid <= ?";
-    }
-
-    sql += ` order by rowid ${order} limit ? offset ?`;
+    const { chain, pageSize, order, startRowId } = req.query;
+    let sql = `SELECT rowid as id, * FROM records WHERE chain = ? AND rowid < ? order by rowid ${order} limit ?`;
 
     // 查询数据库，检查试用 code 是否存在
-    db.all(sql, [pageSize, (page - 1) * pageSize], (err, row) => {
+    db.all(sql, [chain, startRowId, pageSize], (err, row) => {
       if (err) {
         return res.json({
           code: 1002,

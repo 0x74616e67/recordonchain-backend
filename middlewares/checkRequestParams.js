@@ -25,7 +25,7 @@ const rules = {
   },
   startRowId: {
     validator: (value) =>
-      value === undefined ||
+      value === "undefined" ||
       (Number.isInteger(Number(value)) && Number(value) > 0),
     errorMessage: "startRowId is not valid.",
   },
