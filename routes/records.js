@@ -19,10 +19,19 @@ router.get(
   checkRequestParams(["pageSize", "chain", "order", "startRowId"]),
   function (req, res, next) {
     const { chain, pageSize, order, startRowId } = req.query;
-    let sql = `SELECT rowid as id, * FROM records WHERE chain = ? AND rowid < ? order by rowid ${order} limit ?`;
+
+    let sql = "SELECT rowid as id, * FROM records WHERE rowid < ?";
+    let params = [startRowId, pageSize];
+
+    if (chain.trim() !== "") {
+      sql += " AND chain = ?";
+      params.splice(1, 0, chain);
+    }
+
+    sql += ` order by rowid ${order} limit ?`;
 
     // 查询数据库，检查试用 code 是否存在
-    db.all(sql, [chain, startRowId, pageSize], (err, row) => {
+    db.all(sql, params, (err, row) => {
       if (err) {
         return res.json({
           code: 1002,

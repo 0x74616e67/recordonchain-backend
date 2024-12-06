@@ -16,7 +16,8 @@ const rules = {
     errorMessage: "PageSize must be a positive integer.",
   },
   chain: {
-    validator: (value) => Object.keys(NETWORKS).includes(value),
+    validator: (value) =>
+      value.trim() === "" || Object.keys(NETWORKS).includes(value),
     errorMessage: "Chain is not valid.",
   },
   order: {
@@ -26,6 +27,7 @@ const rules = {
   startRowId: {
     validator: (value) =>
       value === "undefined" ||
+      value.trim() === "" ||
       (Number.isInteger(Number(value)) && Number(value) > 0),
     errorMessage: "startRowId is not valid.",
   },
