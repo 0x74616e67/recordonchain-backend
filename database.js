@@ -11,6 +11,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
+db.configure("busyTimeout", 3000); // 设置 3 秒锁超时
+
 module.exports = {
   db,
 };
