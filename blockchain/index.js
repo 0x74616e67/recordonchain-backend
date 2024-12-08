@@ -16,9 +16,9 @@ const NETWORKS = {
     to: process.env.ETHEREUM_TO,
   },
   confluxevmtestnet: {
-    rpcUrl: process.env.CONFLUX_RPC_URL,
-    privateKey: process.env.CONFLUX_PRIVATE_KEY,
-    to: process.env.CONFLUX_TO,
+    rpcUrl: process.env.CONFLUX_TESTNET_ESPACE_RPC_URL,
+    privateKey: process.env.CONFLUX_TESTNET_ESPACE_PRIVATE_KEY,
+    to: process.env.CONFLUX_TESTNET_ESPACE_TO,
   },
 };
 

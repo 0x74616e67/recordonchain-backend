@@ -26,6 +26,8 @@ router.get(
     if (chain.trim() !== "") {
       sql += " AND chain = ?";
       params.splice(1, 0, chain);
+    } else {
+      sql += " AND chain != 'confluxevmtestnet'";
     }
 
     sql += ` order by rowid ${order} limit ?`;
