@@ -4,6 +4,7 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var cors = require("cors");
+var fs = require("fs");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -25,7 +26,38 @@ app.use(
   })
 );
 
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(
+  path.join(__dirname, "logs/access.log"),
+  {
+    flags: "a",
+  }
+);
+
+// 自定义 morgan token type，用来记录 /record router 的 request payload
+logger.token("payload", function (req, res) {
+  return JSON.stringify(req.body).replace(/\"/g, `'`);
+});
+
+// 自定义 morgan token type，用来记录 /record router 的 response data
+logger.token("response", function (req, res) {
+  return res.txData ? JSON.stringify(res.txData).replace(/\"/g, `'`) : null;
+});
+
 app.use(logger("dev"));
+// setup the logger
+app.use(
+  logger(
+    `:remote-addr - :remote-user [:date[clf]] ":method :url :payload HTTP/:http-version" :status :res[content-length] ":response" :total-time[3] ":referrer" ":user-agent"`,
+    {
+      stream: accessLogStream,
+      skip: function (req, res) {
+        return req.method !== "POST";
+      },
+    }
+  )
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
