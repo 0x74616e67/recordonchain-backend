@@ -18,7 +18,7 @@ const verifyCode = function (req, res, next) {
     const { code, chain } = req.body;
 
     if (!code) {
-      return res.json({
+      next({
         code: 1001,
         data: {},
         message: "Code is required",
@@ -31,7 +31,7 @@ const verifyCode = function (req, res, next) {
     // 查询数据库，检查试用 code 是否存在
     db.get(`SELECT * FROM ${TABLE} WHERE code = ?`, [U_CODE], (err, row) => {
       if (err) {
-        return res.json({
+        next({
           code: 1002,
           data: {},
           message: err?.message ? err.message : "Database error",
@@ -40,7 +40,7 @@ const verifyCode = function (req, res, next) {
 
       if (row) {
         if (row.verified) {
-          return res.json({
+          next({
             code: 1005,
             data: {
               verified: true,
@@ -48,7 +48,7 @@ const verifyCode = function (req, res, next) {
             message: "Code is verified",
           });
         } else if (row.locked) {
-          return res.json({
+          next({
             code: 1006,
             data: {
               verified: false,
@@ -63,7 +63,7 @@ const verifyCode = function (req, res, next) {
             [U_CODE],
             function (err) {
               if (err) {
-                return res.json({
+                next({
                   code: 1002,
                   data: {},
                   message: err?.message ? err.message : "Database error",
@@ -71,7 +71,7 @@ const verifyCode = function (req, res, next) {
               } else {
                 // 检查更新的行数
                 if (this.changes === 0) {
-                  return res.json({
+                  next({
                     code: 1002,
                     data: {},
                     message: err?.message ? err.message : "Database error",
@@ -87,7 +87,7 @@ const verifyCode = function (req, res, next) {
           );
         }
       } else {
-        return res.json({
+        next({
           code: 1003,
           data: {
             verified: false,
@@ -111,7 +111,7 @@ const updateCode = function (req, res, next) {
     // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
     db.run(sql, [U_CODE], function (err) {
       if (err) {
-        return res.json({
+        next({
           code: 1002,
           data: {},
           message: err?.message ? err.message : "Database error",
@@ -119,7 +119,7 @@ const updateCode = function (req, res, next) {
       } else {
         // 检查更新的行数
         if (this.changes === 0) {
-          return res.json({
+          next({
             code: 1002,
             data: {},
             message: err?.message ? err.message : "Database error",

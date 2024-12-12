@@ -41,7 +41,8 @@ logger.token("payload", function (req, res) {
 
 // 自定义 morgan token type，用来记录 /record router 的 response data
 logger.token("response", function (req, res) {
-  return res.txData ? JSON.stringify(res.txData).replace(/\"/g, `'`) : null;
+  const data = res.txData || res.errorInfo;
+  return data ? JSON.stringify(data).replace(/\"/g, `'`) : null;
 });
 
 app.use(logger("dev"));
