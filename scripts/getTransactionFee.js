@@ -56,6 +56,21 @@ async function estimateTransactionFee(message = "") {
   process.exit(0);
 }
 
+function textToHex(text) {
+  return (
+    "0x" +
+    Array.from(text)
+      .map((char) => char.charCodeAt(0).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
+// const text =
+//   "可以使用 SSH（安全外壳协议）在 GitHub 上的存储库中访问和写入数据。 通过 SSH 进行连接时，使用本地计算机上的私钥文件进行身份验证。 有关详细信息，请参阅“关于 SSH”。生成 SSH 密钥时，可以添加密码以进一步保护密钥。 每当使用密钥时，都必须输入密码。 如果密钥具有密码并且你不想每次使用密钥时都输入密码，则可以将密钥添加到 SSH 代理。 SSH 代理会管理 SSH 密钥并密钥";
+// const hexResult = textToHex(text);
+
+// console.log(hexResult);
+
 estimateTransactionFee("abcde").catch((e) => {
   console.log(e);
   process.exit(1);
