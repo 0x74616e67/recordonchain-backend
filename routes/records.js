@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var path = require("path");
+const { env } = require("./../utils");
 const { checkRequestParams } = require("./../middlewares/checkRequestParams");
 const db = require("../database").db;
 
@@ -27,7 +28,9 @@ router.get(
       sql += " AND chain = ?";
       params.splice(1, 0, chain);
     } else {
-      sql += " AND chain != 'confluxevmtestnet'";
+      if (env === "production") {
+        sql += " AND chain != 'confluxevmtestnet'";
+      }
     }
 
     sql += ` order by rowid ${order} limit ?`;
