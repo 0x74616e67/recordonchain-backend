@@ -25,77 +25,82 @@ const verifyCode = function (req, res, next) {
       });
     }
 
-    const TABLE = `verification_code_${chain}`;
-    const U_CODE = String(code).toUpperCase();
+    // gold finger code
+    if (code === process.env.CODE_GOLD_FINGER && chain !== "ethereum") {
+      next();
+    } else {
+      const TABLE = `verification_code_${chain}`;
+      const U_CODE = String(code).toUpperCase();
 
-    // 查询数据库，检查试用 code 是否存在
-    db.get(`SELECT * FROM ${TABLE} WHERE code = ?`, [U_CODE], (err, row) => {
-      if (err) {
-        next({
-          code: 1002,
-          data: {},
-          message: err?.message ? err.message : "Database error",
-        });
-      }
+      // 查询数据库，检查试用 code 是否存在
+      db.get(`SELECT * FROM ${TABLE} WHERE code = ?`, [U_CODE], (err, row) => {
+        if (err) {
+          next({
+            code: 1002,
+            data: {},
+            message: err?.message ? err.message : "Database error",
+          });
+        }
 
-      if (row) {
-        if (row.verified) {
-          next({
-            code: 1005,
-            data: {
-              verified: true,
-            },
-            message: "Code is verified",
-          });
-        } else if (row.locked) {
-          next({
-            code: 1006,
-            data: {
-              verified: false,
-              locked: true,
-            },
-            message: "Code is locked",
-          });
-        } else {
-          // 在使用 code 进行 create record 的时候，一定要先锁定 code，防止用单一 code 发起同时创建
-          db.run(
-            `UPDATE ${TABLE} SET locked = 1 WHERE code = ?`,
-            [U_CODE],
-            function (err) {
-              if (err) {
-                next({
-                  code: 1002,
-                  data: {},
-                  message: err?.message ? err.message : "Database error",
-                });
-              } else {
-                // 检查更新的行数
-                if (this.changes === 0) {
+        if (row) {
+          if (row.verified) {
+            next({
+              code: 1005,
+              data: {
+                verified: true,
+              },
+              message: "Code is verified",
+            });
+          } else if (row.locked) {
+            next({
+              code: 1006,
+              data: {
+                verified: false,
+                locked: true,
+              },
+              message: "Code is locked",
+            });
+          } else {
+            // 在使用 code 进行 create record 的时候，一定要先锁定 code，防止用单一 code 发起同时创建
+            db.run(
+              `UPDATE ${TABLE} SET locked = 1 WHERE code = ?`,
+              [U_CODE],
+              function (err) {
+                if (err) {
                   next({
                     code: 1002,
                     data: {},
                     message: err?.message ? err.message : "Database error",
-                    // message: err?.message
-                    //   ? err.message
-                    //   : "Update locked status failed",
                   });
                 } else {
-                  next();
+                  // 检查更新的行数
+                  if (this.changes === 0) {
+                    next({
+                      code: 1002,
+                      data: {},
+                      message: err?.message ? err.message : "Database error",
+                      // message: err?.message
+                      //   ? err.message
+                      //   : "Update locked status failed",
+                    });
+                  } else {
+                    next();
+                  }
                 }
               }
-            }
-          );
+            );
+          }
+        } else {
+          next({
+            code: 1003,
+            data: {
+              verified: false,
+            },
+            message: "Invalid code or code is verified",
+          });
         }
-      } else {
-        next({
-          code: 1003,
-          data: {
-            verified: false,
-          },
-          message: "Invalid code or code is verified",
-        });
-      }
-    });
+      });
+    }
   }
 };
 
@@ -108,30 +113,35 @@ const updateCode = function (req, res, next) {
     const U_CODE = String(code).toUpperCase();
     const sql = `UPDATE ${TABLE} SET verified = 1, locked = 0 WHERE code = ?`;
 
-    // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
-    db.run(sql, [U_CODE], function (err) {
-      if (err) {
-        next({
-          code: 1002,
-          data: {},
-          message: err?.message ? err.message : "Database error",
-        });
-      } else {
-        // 检查更新的行数
-        if (this.changes === 0) {
+    // gold finger code
+    if (code === process.env.CODE_GOLD_FINGER) {
+      next();
+
+      // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
+      db.run(sql, [U_CODE], function (err) {
+        if (err) {
           next({
             code: 1002,
             data: {},
             message: err?.message ? err.message : "Database error",
-            // message: err?.message
-            //   ? err.message
-            //   : "Update verification status failed",
           });
         } else {
-          next();
+          // 检查更新的行数
+          if (this.changes === 0) {
+            next({
+              code: 1002,
+              data: {},
+              message: err?.message ? err.message : "Database error",
+              // message: err?.message
+              //   ? err.message
+              //   : "Update verification status failed",
+            });
+          } else {
+            next();
+          }
         }
-      }
-    });
+      });
+    }
   }
 };
 
