@@ -24,7 +24,6 @@ const verifyCode = function (req, res, next) {
         message: "Code is required",
       });
     }
-
     // gold finger code
     if (code === process.env.CODE_GOLD_FINGER && chain !== "ethereum") {
       next();
@@ -116,7 +115,7 @@ const updateCode = function (req, res, next) {
     // gold finger code
     if (code === process.env.CODE_GOLD_FINGER) {
       next();
-
+    } else {
       // 这个是后续步骤，先前已经验证过 code 了，所以此处直接使用
       db.run(sql, [U_CODE], function (err) {
         if (err) {
