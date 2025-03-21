@@ -19,6 +19,8 @@ var app = express();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
+app.disable("x-powered-by");
+
 // TODO 开发期间暂时对 localhost:3000 开放
 app.use(
   cors({
